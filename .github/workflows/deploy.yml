@@ -26,6 +26,9 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v4
 
+    - name: Debug Exact Repo String
+      run: echo "THE EXACT STRING AWS EXPECTS IS ---> repo:${{ github.repository }}:*"
+
     - name: Configure AWS Credentials
       uses : aws-actions/configure-aws-credentials@v4
       with :
