@@ -28,7 +28,7 @@ resource "aws_iam_role" "github_actions" {
         }
         # STRICT SECURITY: Only allow your specific repo to assume this role
         StringLike = {
-          "token.actions.githubusercontent.com:sub" = "repo:sujal-surani/*"
+          "token.actions.githubusercontent.com:sub" = "repo:*"
         }
       }
     }]
