@@ -1,8 +1,8 @@
-resource "aws_dynamodb_table" "survey_table"{
-  name = "survey-rewards-data"
+resource "aws_dynamodb_table" "survey_table" {
+  name         = "survey-rewards-data"
   billing_mode = "PAY_PER_REQUEST"
-  hash_key = "PK"
-  range_key = "SK"
+  hash_key     = "PK"
+  range_key    = "SK"
 
   attribute {
     name = "PK"
@@ -18,7 +18,7 @@ resource "aws_dynamodb_table" "survey_table"{
   }
 
   tags = {
-    Project = "serverless-survey-api"
+    Project     = "serverless-survey-api"
     Environment = "dev"
   }
 }
@@ -28,5 +28,5 @@ output "dynamodb_table_name" {
 }
 
 output "dynamo_table_arn" {
-    value = aws_dynamodb_table.survey_table.arn
+  value = aws_dynamodb_table.survey_table.arn
 }
