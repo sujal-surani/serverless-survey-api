@@ -1,5 +1,3 @@
-# infrastructure/lambda.tf
-
 # 1. Zip the Python code
 data "archive_file" "validation_lambda_zip" {
   type        = "zip"
