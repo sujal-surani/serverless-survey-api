@@ -73,3 +73,15 @@ resource "aws_iam_role_policy" "lambda_policy" {
     ]
   })
 }
+
+# infrastructure/lambda.tf (append to bottom)
+
+resource "aws_lambda_permission" "api_gateway_invoke" {
+  statement_id  = "AllowAPIGatewayInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.validation_lambda.function_name
+  principal     = "apigateway.amazonaws.com"
+
+  # The /*/* restricts invocation to ONLY this specific API Gateway
+  source_arn = "${aws_apigatewayv2_api.survey_api.execution_arn}/*/*"
+}
