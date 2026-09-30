@@ -55,14 +55,19 @@ def handler(event, context):
         )
 
         #5 Return fast response to API gateway
-        return{
-            "statusCode": 200,
-            "body": json.dumps({
-                "message": "Survey Processed Successfully",
-                "points": points_awarded,
-                "transaction_id": transaction_id
-            })
-        }
+        return {
+                "statusCode": 200,
+                "headers": {
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Headers": "Content-Type",
+                    "Access-Control-Allow-Methods": "OPTIONS,POST"
+                },
+                "body": json.dumps({
+                    "message": "Survey Processed Successfully",
+                    "points": points_awarded,
+                    "transaction_id": transaction_id
+                })
+            }
     
     except Exception as e:
         print(f"Error processing survey: {str(e)}")

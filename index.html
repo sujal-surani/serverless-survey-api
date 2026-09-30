@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Serverless Survey Rewards</title>
+    <style>
+        body { font-family: system-ui, sans-serif; padding: 2rem; max-width: 450px; margin: 0 auto; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; }
+        input, select { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        
+        .primary-btn { padding: 12px; background: #007bff; color: white; border: none; cursor: pointer; border-radius: 5px; width: 100%; font-weight: bold; }
+        .primary-btn:hover { background: #0056b3; }
+        
+        #responseBox { margin-top: 20px; padding: 15px; background: #e8f5e9; border: 1px solid #c8e6c9; border-radius: 5px; display: none; }
+        
+        /* New Rewards Section Styles */
+        .rewards-card { margin-top: 20px; padding: 20px; background: #fff3cd; border: 1px solid #ffeeba; border-radius: 5px; display: none; }
+        .rewards-header { margin-top: 0; display: flex; align-items: center; justify-content: space-between; font-size: 1.2rem; font-weight: bold; }
+        .refresh-btn { padding: 6px 12px; background: #ffc107; color: #333; border: none; border-radius: 4px; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; font-weight: bold; }
+        .refresh-btn:hover { background: #e0a800; }
+        
+        .spin { animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <h2>Submit Survey</h2>
+    
+    <div class="form-group">
+        <label for="usernameInput">Username:</label>
+        <input type="text" id="usernameInput" placeholder="Enter your username..." required>
+    </div>
+
+    <div class="form-group">
+        <label for="surveySelect">Select Survey:</label>
+        <select id="surveySelect">
+            <option value="cloud_architecture_v1">Cloud Architecture Feedback</option>
+            <option value="devops_tooling_v2">DevOps Tooling Assessment</option>
+            <option value="aws_experience_v1">AWS User Experience</option>
+        </select>
+    </div>
+
+    <button id="submitBtn" class="primary-btn" onclick="sendSurvey()">Complete Survey</button>
+    
+    <div id="responseBox">
+        <p><strong>Status:</strong> <span id="status"></span></p>
+    </div>
+
+    <!-- New Rewards Tracking Card -->
+    <div id="rewardsCard" class="rewards-card">
+        <div class="rewards-header">
+            <span>🏆 Reward Status</span>
+            <button class="refresh-btn" onclick="refreshStatus()">
+                <span id="refreshIcon">&#x21bb;</span> Refresh
+            </button>
+        </div>
+        <p><strong>Transaction ID:</strong> <br><span id="rewardTxId" style="font-family: monospace; font-size: 0.85em; color: #555;"></span></p>
+        <p><strong>Current State:</strong> <span id="rewardStatus" style="font-weight: bold; color: #856404;">⏳ Pending (In Queue)</span></p>
+    </div>
+
+    <script>
+        // Your actual API Gateway URL
+        const apiUrl = "https://qhan7j6vj0.execute-api.ap-south-1.amazonaws.com/v1/survey";
+        let currentTransactionId = "";
+
+        async function sendSurvey() {
+            const username = document.getElementById('usernameInput').value;
+            const survey = document.getElementById('surveySelect').value;
+            const btn = document.getElementById('submitBtn');
+
+            if (!username.trim()) {
+                alert("Please enter a username!");
+                return;
+            }
+
+            btn.innerText = "Processing Pipeline...";
+            btn.disabled = true;
+            
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: username, survey_id: survey })
+                });
+
+                const rawData = await response.json();
+                const data = typeof rawData.body === 'string' ? JSON.parse(rawData.body) : rawData;
+                
+                if (response.ok && data.points) {
+                    // Show success box
+                    document.getElementById('responseBox').style.display = 'block';
+                    document.getElementById('status').innerText = `${data.message} (+${data.points} points)`;
+                    
+                    // Setup and show the Rewards Wallet card
+                    currentTransactionId = data.transaction_id;
+                    document.getElementById('rewardTxId').innerText = currentTransactionId;
+                    document.getElementById('rewardStatus').innerText = "⏳ Pending (In Queue)";
+                    document.getElementById('rewardsCard').style.display = 'block';
+                } else {
+                    alert("API Error: " + (data.message || "Failed to process survey."));
+                }
+                
+            } catch (error) {
+                alert("Error connecting to API. Check console.");
+            } finally {
+                btn.innerText = "Complete Survey";
+                btn.disabled = false;
+            }
+        }
+
+        async function refreshStatus() {
+            if (!currentTransactionId) return;
+
+            const icon = document.getElementById('refreshIcon');
+            const statusText = document.getElementById('rewardStatus');
+            
+            // Spin the icon
+            icon.classList.add('spin');
+            statusText.innerText = "Checking DynamoDB...";
+
+            try {
+                // Attempt to call a GET endpoint that doesn't exist yet!
+                const response = await fetch(`${apiUrl}/${currentTransactionId}`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    statusText.innerText = "✅ Reward Delivered!";
+                    statusText.style.color = "green";
+                } else {
+                    // API Gateway will return a 403 or 404 because we haven't built the GET route
+                    statusText.innerText = "Endpoint Missing: Need to build GET route!";
+                    statusText.style.color = "red";
+                }
+            } catch (error) {
+                statusText.innerText = "Network Error";
+            } finally {
+                setTimeout(() => icon.classList.remove('spin'), 500);
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,12 +1,12 @@
-#1 Create HTTP API gateway 
 resource "aws_apigatewayv2_api" "survey_api" {
-  name          = "survey-rewards-api"
+  name          = "survey-api"
   protocol_type = "HTTP"
 
+  # Add this block to allow browser requests
   cors_configuration {
-    allow_origins = ["*"]
-    allow_methods = ["POST", "OPTIONS"]
-    allow_headers = ["content-type"]
+    allow_origins = ["*"] # In production, restrict this to your specific domain
+    allow_methods = ["POST", "OPTIONS", "GET"]
+    allow_headers = ["Content-Type"]
   }
 }
 
