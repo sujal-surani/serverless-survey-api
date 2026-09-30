@@ -7,7 +7,7 @@ from datetime import datetime
 #Initialize AWS client
 
 dynamodb = boto3.resource('dynamodb')
-sqs = boto3.resource('sqs')
+sqs = boto3.client('sqs')
 
 def handler(event, context):
     try:
@@ -51,7 +51,7 @@ def handler(event, context):
 
         sqs.send_message(
             QueueUrl = queue_url,
-            MessageBody = json.dump(message_body)
+            MessageBody = json.dumps(message_body)
         )
 
         #5 Return fast response to API gateway
