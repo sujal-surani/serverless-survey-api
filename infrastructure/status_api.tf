@@ -31,7 +31,7 @@ resource "aws_apigatewayv2_integration" "status_integration" {
 # The GET Route with the path parameter {transaction_id}
 resource "aws_apigatewayv2_route" "status_route" {
   api_id    = aws_apigatewayv2_api.survey_api.id
-  route_key = "GET /v1/survey/{transaction_id}"
+  route_key = "GET /survey/{transaction_id}"
   target    = "integrations/${aws_apigatewayv2_integration.status_integration.id}"
 }
 
