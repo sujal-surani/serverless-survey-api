@@ -61,10 +61,13 @@
         <p><strong>Current State:</strong> <span id="rewardStatus" style="font-weight: bold; color: #856404;">⏳ Pending (In Queue)</span></p>
     </div>
 
+    <script src="config.js"></script>
+    
     <script>
-        // Your actual API Gateway URL
-        const apiUrl = "https://qhan7j6vj0.execute-api.ap-south-1.amazonaws.com/v1/survey";
+        // Use the variable from config.js instead!
+        const apiUrl = `${CONFIG.API_URL}/survey`;
         let currentTransactionId = "";
+   
 
         async function sendSurvey() {
             const username = document.getElementById('usernameInput').value;
